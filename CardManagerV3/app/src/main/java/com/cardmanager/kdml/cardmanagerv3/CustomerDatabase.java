@@ -1,5 +1,6 @@
 package com.cardmanager.kdml.cardmanagerv3;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -81,7 +82,7 @@ public class CustomerDatabase {
 
         dbHelper = new DatabaseHelper(context);
         db = dbHelper.getWritableDatabase();
-        //dbHelper.onCreate(db);
+
         return true;
     }
     /**
@@ -125,9 +126,20 @@ public class CustomerDatabase {
 
         return true;
     }
+    public boolean insert(String tableName, ContentValues values){
+        try {
+            db.insert(tableName,null,values);
+        } catch(Exception ex) {
+            Log.e(TAG, "Exception in insert()", ex);
+            return false;
+        }
+        return true;
+    }
     public void onUpdateDatabase()
     {
+
         dbHelper.onUpgrade(db,1,2);
+
     }
 
     //// DatabaseHelper 클래스
@@ -137,6 +149,7 @@ public class CustomerDatabase {
         {
             super(context, initPath()+"/"+DATABASE_NAME, null, DATABASE_VERSION);
         }
+
 
         public void onCreate(SQLiteDatabase db)
         {
@@ -188,15 +201,20 @@ public class CustomerDatabase {
         public void onUpgrade(SQLiteDatabase db, int oldVersion,
                               int newVersion)
         {
-            println("Upgrading database from version " + oldVersion + " to " + newVersion + ".");
-            try {
-                if (oldVersion < newVersion) {   // version 1
-                    //db.execSQL("DROP TABLE IF EXISTS " + TABLE_CARD_INFO);
-                    onCreate(db);
-                }
-            }catch (Exception ex) {
+            // TABLE_CUSTOMER_INFO
+            println("creating table [" + TABLE_SMS_DATA + "].");
 
+            // drop existing table
+            String DROP_SQL = "drop table if exists " + TABLE_SMS_DATA;
+            try {
+                db.execSQL(DROP_SQL);
+            } catch(Exception ex) {
+                Log.e(TAG, "Exception in DROP_SQL TABLE_SMS_DATA", ex);
             }
+
+            onCreate(db);
+
+
         }
 
     }

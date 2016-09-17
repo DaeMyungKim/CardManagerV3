@@ -40,19 +40,23 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 Log.e("KDMsss", "db 열기 실패");
                 return;
             }
+            // db 업데이트
+            cd.onUpdateDatabase();
+
             String query = "select dataTime from "+cd.TABLE_SMS_DATA+" order by dataTime desc limit 1";
             cs = cd.rawQuery(query);
-            cs.moveToNext();
-            int lastData = cs.getInt(0);
-            Log.e("KDMsss", "lastData = "+lastData);
+            cs.moveToFirst();
             if(cs.getCount() == 0)
             {
-                Log.e("KDMsss", "마지막 저장된 정보 없음.");
-                // 전체 메시지를 인서트
-                //setSMSDataToDataBase(context.getApplicationContext().getContentResolver(),lastData+"");
+                Log.d("KDMsss", "마지막 저장된 정보 없음.");
             }
-            String selection = "address = ?";
-            String[] selectionArgs = {""};
+            else
+            {
+                String lastData = cs.getString(0);
+                Log.d("KDMsss", "lastData = "+lastData);
+            }
+            String selection = "address = ? or address = ?";
+            String[] selectionArgs = {"15776200","15447200"};
             String sortOrder = "date ASC";
             // SMS 문자 데이터를 전부 읽어옴
             ContentResolver cr = context.getApplicationContext().getContentResolver();
@@ -60,37 +64,48 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             if(c.moveToFirst()){
                 while(c.moveToNext()){
                     String strAdd = c.getString(c.getColumnIndex("address"));
+                    String date = c.getString(c.getColumnIndex("date"));
+                    Log.d("KDMsss", "strAdd = "+strAdd +  "date = "+date);
+                    long origin = (long) Double.parseDouble(date);
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(origin);
+                    int yyyy = cal.get(Calendar.YEAR);
+                    int MM = (cal.get(Calendar.MONTH) + 1);
+                    int dd = cal.get(Calendar.DATE);
+                    int HH = cal.get(Calendar.HOUR);
+                    int mm = cal.get(Calendar.MINUTE);
+                    int ss = cal.get(Calendar.SECOND);
+                    boolean flag = false;
+                    String cardName = "",won = "",type = "";
+                    String str = c.getString(c.getColumnIndex("body"));
+                    if (strAdd.equals("15776200")) { // 현대카드
+                        String strCnvert = str.replace("\r","");
+                        String[] spl = strCnvert.split("\\n");
+                        won = getNum(spl[3]);
 
-                    try {
-                        String date = c.getString(c.getColumnIndex("date"));
-                        long origin = (long) Double.parseDouble(date);
-                        Calendar cal = Calendar.getInstance();
-                        cal.setTimeInMillis(origin);
-                        int yyyy = cal.get(Calendar.YEAR);
-                        int MM = (cal.get(Calendar.MONTH) + 1);
-                        int dd = cal.get(Calendar.DATE);
-                        int HH = cal.get(Calendar.HOUR);
-                        int mm = cal.get(Calendar.MINUTE);
-                        int ss = cal.get(Calendar.SECOND);
-                        String cardName = "",won = "";
-                        String str = c.getString(c.getColumnIndex("body"));
-                        if (strAdd.equals("15776200")) { // 현대카드
-                            String[] spl = str.split("\\n");
-                            won = getNum(spl[3].split(" ")[0]);
-                            cardName = "현대카드"+ spl[1].substring(0, spl[1].indexOf(" "));
-                        }
-                        if (strAdd.equals("15447200")) { // 신한카드
-                            String[] spl2 = str.split(" ");
-                            won = getNum(spl2[4]);
-                            cardName = "신한카드" + spl2[1];
-                        }
+                        type = "승인";
+                        if(spl[1].contains("취소"))
+                            type = "취소";
 
-                        String dateConvert = yyyy + "" + MM + "" + dd + " " + HH + ":" + mm + ":" + ss + "";
-                        Log.d("shue", "body:" + str);
-                        Log.d("shue", "date(origin):" + date);
-                        Log.d("shue", "date:" + dateConvert);
-                        Log.d("shue", "type:" + c.getString(c.getColumnIndex("type")));
-                        Log.d("shue", "address:" + c.getString(c.getColumnIndex("address")));
+                        cardName = spl[1].substring(0, spl[1].indexOf("]")).replace("[","");
+                        flag = true;
+                    }
+                    if (strAdd.equals("15447200")) { // 신한카드
+                        String[] spl2 = str.split("\\n");
+                        spl2 = spl2[1].split(" ");
+                        won = getNum(spl2[4]);
+
+                        type = "승인";
+                        if(spl2[0].contains("취소"))
+                            type = "취소";
+
+                        cardName = "신한카드"+spl2[1];
+                        flag = true;
+                    }
+
+                    if(flag)
+                    {
+                        String dateConvert = yyyy + "" + (MM < 10 ? "0"+MM : MM) + "" + (dd < 10 ? "0"+dd : dd) + " " + HH + ":" + mm + ":" + ss + "";
                         ContentValues values = new ContentValues();
                         values.put("cardName",cardName);
                         values.put("dataTime",date);
@@ -101,11 +116,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                         values.put("year",yyyy);
                         values.put("month",MM);
                         values.put("day",dd);
-                        //CustomerDatabase.getInstance(null).insertSMSData(values);
+                        values.put("type",type);
 
-
-                    } catch (Exception ex) {
-                        Log.e("CardManagerClient", "Exception in getCardCostData()", ex);
+                        if(!cd.insert(cd.TABLE_SMS_DATA,values))
+                            Log.d("KDMsss", "DB insert (TABLE_SMS_DATA) 실패 = "+strAdd +  "date = "+date);
                     }
                 }
             }
@@ -121,68 +135,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 cs.close();
         }
     }
-    public void setSMSDataToDataBase(ContentResolver cr,String lastData)
-    {
 
-        String selection = "address = ?";
-        String[] selectionArgs = {""};
-        String sortOrder = "date ASC";
-        // SMS 문자 데이터를 전부 읽어옴
-        Cursor c = cr.query(Uri.parse("content://sms/inbox"), null, selection, selectionArgs, sortOrder);
-        if(c.moveToFirst()){
-            while(c.moveToNext()){
-                String strAdd = c.getString(c.getColumnIndex("address"));
-
-                try {
-                    String date = c.getString(c.getColumnIndex("date"));
-                    long origin = (long) Double.parseDouble(date);
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTimeInMillis(origin);
-                    int yyyy = cal.get(Calendar.YEAR);
-                    int MM = (cal.get(Calendar.MONTH) + 1);
-                    int dd = cal.get(Calendar.DATE);
-                    int HH = cal.get(Calendar.HOUR);
-                    int mm = cal.get(Calendar.MINUTE);
-                    int ss = cal.get(Calendar.SECOND);
-                    String cardName = "",won = "";
-                    String str = c.getString(c.getColumnIndex("body"));
-                    if (strAdd.equals("15776200")) { // 현대카드
-                        String[] spl = str.split("\\n");
-                        won = getNum(spl[3].split(" ")[0]);
-                        cardName = "현대카드"+ spl[1].substring(0, spl[1].indexOf(" "));
-                    }
-                    if (strAdd.equals("15447200")) { // 신한카드
-                        String[] spl2 = str.split(" ");
-                        won = getNum(spl2[4]);
-                        cardName = "신한카드" + spl2[1];
-                    }
-
-                    String dateConvert = yyyy + "" + MM + "" + dd + " " + HH + ":" + mm + ":" + ss + "";
-                    Log.d("shue", "body:" + str);
-                    Log.d("shue", "date(origin):" + date);
-                    Log.d("shue", "date:" + dateConvert);
-                    Log.d("shue", "type:" + c.getString(c.getColumnIndex("type")));
-                    Log.d("shue", "address:" + c.getString(c.getColumnIndex("address")));
-                    ContentValues values = new ContentValues();
-                    values.put("cardName",cardName);
-                    values.put("dataTime",date);
-                    values.put("cost",won);
-                    values.put("text",str);
-                    values.put("dateTimeConvert",dateConvert);
-                    values.put("company",strAdd);
-                    values.put("year",yyyy);
-                    values.put("month",MM);
-                    values.put("day",dd);
-                    //CustomerDatabase.getInstance(null).insertSMSData(values);
-
-
-                } catch (Exception ex) {
-                    Log.e("CardManagerClient", "Exception in getCardCostData()", ex);
-                }
-            }
-        }
-        c.close();
-    }
     public String getNum(String strs)
     {
         String won="";
