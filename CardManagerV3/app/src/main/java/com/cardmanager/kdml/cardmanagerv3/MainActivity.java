@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         checkSMSPermissions();
     }
-
+//a/aaaaaaaa
     private void checkSMSPermissions(){
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECEIVE_SMS);
         if(permissionCheck == PackageManager.PERMISSION_GRANTED){
