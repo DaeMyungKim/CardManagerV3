@@ -1,0 +1,104 @@
+{
+  "project_info": {
+    "project_number": "122235655613",
+    "firebase_url": "https://api-project-122235655613.firebaseio.com",
+    "project_id": "api-project-122235655613",
+    "storage_bucket": "api-project-122235655613.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122235655613:android:701bf866a4f8e5bb",
+        "android_client_info": {
+          "package_name": "com.cardmanager.kdml.cardmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122235655613-cqs88u23pu455uh7b23shvtc3iqeu3kt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIWZlVt4kwnTLgp1DWM9UxsoLpYVi5XYQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122235655613:android:53cc32ad890000e8",
+        "android_client_info": {
+          "package_name": "com.kdml.cardmanagerhost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122235655613-cqs88u23pu455uh7b23shvtc3iqeu3kt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIWZlVt4kwnTLgp1DWM9UxsoLpYVi5XYQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122235655613:android:bce3c9c2785fefe5",
+        "android_client_info": {
+          "package_name": "com.cardmanager.kdml.cardmanagerv3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122235655613-cqs88u23pu455uh7b23shvtc3iqeu3kt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIWZlVt4kwnTLgp1DWM9UxsoLpYVi5XYQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

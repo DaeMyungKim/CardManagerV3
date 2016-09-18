@@ -1,6 +1,7 @@
 package com.cardmanager.kdml.cardmanagerv3;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -21,6 +22,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.cardmanager.kdml.cardmanagerv3.DTO.CostData;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.text.DecimalFormat;
 import java.util.Calendar;
@@ -32,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     IconTextListAdapter adapter;
     //private DatabaseReference mDatabase;
     HashMap<String,CostData> map;
-
+    CustomerDatabase cd =null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(getBaseContext(),EmailPasswordActivity.class);
+            startActivityForResult(intent,REQUEST_CODE_LOGIN);
             return true;
         }
 
@@ -117,72 +122,60 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        setListData();
-        //setData();
-    }
-    /*
-    public void setData()
-    {
-        if(map==null)
-            map =new HashMap<String, CostData>();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user == null)
+        {
+            Intent intent = new Intent(getBaseContext(),EmailPasswordActivity.class);
+            startActivityForResult(intent,REQUEST_CODE_LOGIN);
+        }
         else
-            map.clear();
+        {
+            new EmailPasswordActivity().readUsers(user.getUid());
+        }
+        cd = CustomerDatabase.getInstance(this);
+        setListData();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("costs");
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot snapshot : dataSnapshot.getChildren())
+    }
+    public static final int REQUEST_CODE_LOGIN = 1;
+    protected void onActivityResult(int requestCode,int resultCode,Intent Data){
+        super.onActivityResult(requestCode,resultCode,Data);
+
+        switch (requestCode)
+        {
+            case REQUEST_CODE_LOGIN:
+                break;
+            /*
+            case REQUEST_CODE_CARD_ADD:
+                break;
+            case REQUEST_CODE_REGIST_USER:
+                if(resultCode == RESULT_OK)
                 {
-                    try{
-                        String key = snapshot.getKey();
-                        Object obj = snapshot.getValue(Object.class);
-                        String[] spl = obj.toString().split("=\\{");
-                        Log.d("kdml",key+"  "+spl[0]+"  "+spl[1]);
-                        CostData cd = snapshot.getValue(CostData.class);
-                        Log.d("kdml",cd.getCardName()+cd.getDateTime()+cd.getYearMonth()+cd.getYearMonth()+cd.getCardName()+cd.getCost());
-                        //CostData lcd = map.get(cd.getCardName());
-                        /*
-                        if(lcd != null)
-                        {
-                            if(Long.valueOf(lcd.getDateTimeOrigin())<Long.valueOf(cd.getDateTimeOrigin()))
-                            {
-                                map.remove(lcd);
-                                map.put(cd.getCardName(),cd);
-                            }
-                        }
-                        else
-                        //map.put(cd.getCardName()+cd.getEmail(),cd);
-
-                    }
-                    catch (ClassCastException e)
+                    int i = Data.getExtras().getInt("data");
+                    if(i == 1)
                     {
-                        e.printStackTrace();
+                        Toast toast = Toast.makeText(getBaseContext(),getResources().getText(R.string.main_message1),Toast.LENGTH_LONG);
+                        toast.show();
                     }
                 }
-                setListData();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("kdml", "Failed to read value. : " + databaseError.toException());
-            }
-        });
-
+                break;*/
+        }
     }
-*/
+
     public void setListData()
     {
-        CustomerDatabase cd ;
         Cursor cs = null;
         try {
-            cd = CustomerDatabase.getInstance(this);
+
             // DB 확인.
             if (!cd.open()) {
                 // db 열기 실패, 종료
                 Log.e("KDMsss", "db 열기 실패");
+                finish();
                 return;
             }
+            cd.onUpdateDatabase();
 
             if(map==null)
                 map =new HashMap<String, CostData>();
@@ -193,7 +186,6 @@ public class MainActivity extends AppCompatActivity {
 
             // 아이템 데이터 만들기
             Resources res = getResources();
-            String fmt=new DecimalFormat("##,###").format(23423.44);
 
             Calendar cal = Calendar.getInstance();
             String yyyy = String.valueOf(cal.get(Calendar.YEAR));
@@ -202,10 +194,12 @@ public class MainActivity extends AppCompatActivity {
             String query = "select cardName,sum(cost) from TABLE_SMS_DATA where month = '"+MM+"' and year = '"+yyyy+"' and type = '승인' group by cardName";
             cs = cd.rawQuery(query);
             if(cs.moveToFirst()){
-
-                adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.icon06), cs.getString(0), yyyy+"년 "+MM+"월", new DecimalFormat("##,###").format(cs.getDouble(1))+"원"));
-                while(cs.moveToNext()){
+                if(cs.getCount() > 0)
+                {
                     adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.icon06), cs.getString(0), yyyy+"년 "+MM+"월", new DecimalFormat("##,###").format(cs.getDouble(1))+"원"));
+                    while(cs.moveToNext()){
+                        adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.icon06), cs.getString(0), yyyy+"년 "+MM+"월", new DecimalFormat("##,###").format(cs.getDouble(1))+"원"));
+                    }
                 }
             }
 

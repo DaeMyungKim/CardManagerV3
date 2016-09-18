@@ -28,6 +28,7 @@ public class CustomerDatabase {
      * table name
      */
     public static String TABLE_SMS_DATA = "TABLE_SMS_DATA";
+    public static String TABLE_CUSTOMER_INFO = "TABLE_CUSTOMER_INFO";
     /**
      * version
      */
@@ -79,10 +80,13 @@ public class CustomerDatabase {
      */
     public boolean open() {
         println("opening database [" + DATABASE_NAME + "].");
-
-        dbHelper = new DatabaseHelper(context);
-        db = dbHelper.getWritableDatabase();
-
+        try {
+            dbHelper = new DatabaseHelper(context);
+            db = dbHelper.getWritableDatabase();
+        }catch (Exception ex)
+        {
+            return false;
+        }
         return true;
     }
     /**
@@ -173,6 +177,27 @@ public class CustomerDatabase {
             } catch(Exception ex) {
                 Log.e(TAG, "Exception in CREATE_SQL TABLE_SMS_DATA", ex);
             }
+
+            // TABLE_CUSTOMER_INFO
+            println("creating table [" + TABLE_CUSTOMER_INFO + "].");
+
+            // create table
+            CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE_CUSTOMER_INFO + "("
+                    + "  CUSTOMER_EMAIL TEXT  NOT NULL, "
+                    + "  CUSTOMER_NAME TEXT, "
+                    + "  CUSTOMER_PHONE TEXT, "
+                    + "  FireBase_ID TEXT "
+                    + ")";
+            try {
+                db.execSQL(CREATE_SQL);
+            } catch(Exception ex) {
+                Log.e(TAG, "Exception in CREATE_SQL TABLE_CUSTOMER_INFO", ex);
+            }
+
+            ContentValues values = new ContentValues();
+            values.put("CUSTOMER_EMAIL", "GUEST");
+            values.put("CUSTOMER_NAME", "GUEST");
+            insert(TABLE_CUSTOMER_INFO, values);
         }
 
         public void insertCardInfo()
@@ -210,6 +235,13 @@ public class CustomerDatabase {
                 db.execSQL(DROP_SQL);
             } catch(Exception ex) {
                 Log.e(TAG, "Exception in DROP_SQL TABLE_SMS_DATA", ex);
+            }
+            // drop existing table
+            DROP_SQL = "drop table if exists " + TABLE_CUSTOMER_INFO;
+            try {
+                db.execSQL(DROP_SQL);
+            } catch(Exception ex) {
+                Log.e(TAG, "Exception in DROP_SQL TABLE_CUSTOMER_INFO", ex);
             }
 
             onCreate(db);
