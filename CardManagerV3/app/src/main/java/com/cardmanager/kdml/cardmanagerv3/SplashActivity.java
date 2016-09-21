@@ -14,6 +14,8 @@ public class SplashActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        startActivity(new Intent(this,MainActivity.class));
+        /*
         CustomerDatabase cd = CustomerDatabase.getInstance(this);
         try
         {
@@ -26,7 +28,7 @@ public class SplashActivity extends Activity{
         catch (Exception e)
         {
             e.printStackTrace();
-        }
+        }*/
     }
     protected void onActivityResult(int requestCode,int resultCode,Intent Data){
         super.onActivityResult(requestCode,resultCode,Data);

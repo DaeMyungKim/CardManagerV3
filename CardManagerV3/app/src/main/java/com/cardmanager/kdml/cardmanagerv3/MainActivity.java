@@ -126,8 +126,18 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if(user == null)
         {
-            Intent intent = new Intent(getBaseContext(),EmailPasswordActivity.class);
-            startActivityForResult(intent,REQUEST_CODE_LOGIN);
+            try
+            {
+                Intent intent = new Intent(getBaseContext(),EmailPasswordActivity.class);
+                Bundle bnd = new Bundle();
+                bnd.putInt("loginFlag",1);
+                intent.putExtras(bnd);
+                startActivityForResult(intent,REQUEST_CODE_LOGIN);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else
         {
@@ -144,6 +154,15 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode)
         {
             case REQUEST_CODE_LOGIN:
+                if(resultCode == RESULT_OK)
+                {
+                    int i = Data.getExtras().getInt("data");
+                    if(i != 1)
+                    {
+                        finish();
+                    }
+                }
+
                 break;
             /*
             case REQUEST_CODE_CARD_ADD:
