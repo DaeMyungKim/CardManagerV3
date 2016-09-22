@@ -14,9 +14,13 @@ public class SplashActivity extends Activity{
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+
         startActivity(new Intent(this,MainActivity.class));
+        finish();
+
+
         /*
-        CustomerDatabase cd = CustomerDatabase.getInstance(this);
         try
         {
             Intent intent = new Intent(getBaseContext(),EmailPasswordActivity.class);

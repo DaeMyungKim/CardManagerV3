@@ -62,12 +62,12 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                 return;
 
             Map<String,HashMap> maptest = new HashMap<>();
+            if(cs.getCount() > 0)
+            {
+                if(cs.moveToFirst()){
+                    do{
+                        //cardInfoArrayList.add(new CardInfo(cs));
 
-            if(cs.moveToFirst()){
-                while(cs.moveToNext()){
-                    //cardInfoArrayList.add(new CardInfo(cs));
-                    if(cs.getCount() > 0)
-                    {
                         DecimalFormat fmt=new DecimalFormat("##,###");
                         //String cost = String.valueOf(cs.getString(1));
                         //String cardName, String yearMonth, String cost, String email, String name, String phone
@@ -86,7 +86,7 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                             submap.put(cdata.getCardName(),cdata);
                             maptest.put(cdata.getYearMonth(),submap);
                         }
-                    }
+                    }while(cs.moveToNext());
                 }
             }
             if(user.getUid().length() > 0)
@@ -176,8 +176,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                             won = getNum(spl[3].substring(0, spl[3].indexOf("원")));
 
                             type = "승인";
-                            if (spl[1].contains("취소"))
+                            if (spl[1].contains("취소")) {
                                 type = "취소";
+                                won = "-"+won;
+                            }
 
                             cardName = spl[1].substring(0, spl[1].indexOf("]")).replace("[", "");
                             flag = true;
@@ -188,9 +190,10 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
                             won = getNum(spl2[4]);
 
                             type = "승인";
-                            if (spl2[0].contains("취소"))
+                            if (spl2[0].contains("취소")) {
                                 type = "취소";
-
+                                won = "-"+won;
+                            }
                             cardName = "신한카드" + spl2[1];
                             flag = true;
                         }

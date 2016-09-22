@@ -194,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
                 finish();
                 return;
             }
-            cd.onUpdateDatabase();
+            //cd.onUpdateDatabase();
 
             if(map==null)
                 map =new HashMap<String, CostData>();
@@ -212,13 +212,12 @@ public class MainActivity extends AppCompatActivity {
 
             String query = "select cardName,sum(cost) from TABLE_SMS_DATA where month = '"+MM+"' and year = '"+yyyy+"' and type = '승인' group by cardName";
             cs = cd.rawQuery(query);
-            if(cs.moveToFirst()){
-                if(cs.getCount() > 0)
-                {
-                    adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.icon06), cs.getString(0), yyyy+"년 "+MM+"월", new DecimalFormat("##,###").format(cs.getDouble(1))+"원"));
-                    while(cs.moveToNext()){
+            if(cs.getCount() > 0)
+            {
+                if(cs.moveToFirst()){
+                    do{
                         adapter.addItem(new IconTextItem(res.getDrawable(R.drawable.icon06), cs.getString(0), yyyy+"년 "+MM+"월", new DecimalFormat("##,###").format(cs.getDouble(1))+"원"));
-                    }
+                    }while(cs.moveToNext());
                 }
             }
 

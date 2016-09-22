@@ -159,7 +159,7 @@ public class EmailPasswordActivity extends BaseActivity implements
     // [END on_stop_remove_listener]
     private void createAccount(String email, String password) {
         Log.d(TAG, "createAccount:" + email);
-        if (!validateForm()) {
+        if (!validateForm("ACCOUNT")) {
             return;
         }
 
@@ -213,7 +213,7 @@ public class EmailPasswordActivity extends BaseActivity implements
 
     private void signIn(String email, String password) {
         Log.d(TAG, "signIn:" + email);
-        if (!validateForm()) {
+        if (!validateForm("SIGN")) {
             return;
         }
 
@@ -251,11 +251,11 @@ public class EmailPasswordActivity extends BaseActivity implements
         updateUI(null);
     }
 
-    private boolean validateForm() {
+    private boolean validateForm(String type) {
         boolean valid = true;
 
         String email = mEmailField.getText().toString();
-        if (TextUtils.isEmpty(email)) {
+        if ((type.equals("SIGN") ||type.equals("ACCOUNT"))  && TextUtils.isEmpty(email)) {
             mEmailField.setError("Required.");
             valid = false;
         } else {
@@ -263,7 +263,7 @@ public class EmailPasswordActivity extends BaseActivity implements
         }
 
         String password = mPasswordField.getText().toString();
-        if (TextUtils.isEmpty(password)) {
+        if ((type.equals("SIGN") ||type.equals("ACCOUNT"))  && TextUtils.isEmpty(password)) {
             mPasswordField.setError("Required.");
             valid = false;
         } else {
@@ -271,7 +271,7 @@ public class EmailPasswordActivity extends BaseActivity implements
         }
 
         String name = mNameField.getText().toString();
-        if (TextUtils.isEmpty(name)) {
+        if (type.equals("ACCOUNT") && TextUtils.isEmpty(name)) {
             mNameField.setError("Required.");
             valid = false;
         } else {
@@ -279,7 +279,7 @@ public class EmailPasswordActivity extends BaseActivity implements
         }
 
         String phone = mPhoneField.getText().toString();
-        if (TextUtils.isEmpty(phone)) {
+        if (type.equals("ACCOUNT") && TextUtils.isEmpty(phone)) {
             mPhoneField.setError("Required.");
             valid = false;
         } else {
@@ -327,8 +327,8 @@ public class EmailPasswordActivity extends BaseActivity implements
 
     public boolean updateUserInfo_Email_FireBaseID(User user)
     {
-        CustomerDatabase cd = CustomerDatabase.getInstance(this.getApplicationContext());
-        String UPDATE_SQL = "update " + cd.TABLE_CUSTOMER_INFO +" set CUSTOMER_EMAIL = '" + user.getEmail() +"', CUSTOMER_NAME = '"+user.getName()  +"', FireBase_ID = '" + user.getFireBase_ID()+"'";
+        CustomerDatabase cd = CustomerDatabase.getInstance(null);
+        String UPDATE_SQL = "update " + cd.TABLE_CUSTOMER_INFO +" set CUSTOMER_EMAIL = '" + user.getEmail() +"', CUSTOMER_NAME = '"+user.getName()  +"', FireBase_ID = '" + user.getFireBase_ID()+"', CUSTOMER_PHONE = '" + user.getPhone()+"'";
         try {
             cd.execSQL(UPDATE_SQL);
         } catch(Exception ex) {
