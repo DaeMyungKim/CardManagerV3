@@ -7,8 +7,8 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cardmanager.kdml.cardmanagerv3.DTO.User;
@@ -29,12 +29,13 @@ public class EmailPasswordActivity extends BaseActivity implements
     private static final String TAG = "EmailPassword";
     Bundle extra;
     Intent intent;
-    private TextView mStatusTextView;
-    private TextView mDetailTextView;
+    //private TextView mStatusTextView;
+    //private TextView mDetailTextView;
     private EditText mEmailField;
     private EditText mPasswordField;
     private EditText mNameField;
     private EditText mPhoneField;
+    private CheckBox mCheckBox;
     private boolean isLoginFlag = false;
     private DatabaseReference mDatabase;
     // [START declare_auth]
@@ -54,13 +55,13 @@ public class EmailPasswordActivity extends BaseActivity implements
         String phoneNum = telephonyManager.getLine1Number();
         phoneNum = phoneNum.replace("+82","0");
         // Views
-        mStatusTextView = (TextView) findViewById(R.id.status);
-        mDetailTextView = (TextView) findViewById(R.id.detail);
+        //mStatusTextView = (TextView) findViewById(R.id.status);
+       // mDetailTextView = (TextView) findViewById(R.id.detail);
         mEmailField = (EditText) findViewById(R.id.field_email);
         mPasswordField = (EditText) findViewById(R.id.field_password);
         mNameField = (EditText) findViewById(R.id.field_name);
         mPhoneField = (EditText) findViewById(R.id.field_phone);
-
+        mCheckBox= (CheckBox) findViewById(R.id.checkBox);
         mPhoneField.setText(phoneNum);
         extra = new Bundle();
         intent = new Intent();
@@ -237,7 +238,7 @@ public class EmailPasswordActivity extends BaseActivity implements
 
                         // [START_EXCLUDE]
                         if (!task.isSuccessful()) {
-                            mStatusTextView.setText(R.string.auth_failed);
+                            //mStatusTextView.setText(R.string.auth_failed);
                         }
                         hideProgressDialog();
                         // [END_EXCLUDE]
@@ -286,22 +287,30 @@ public class EmailPasswordActivity extends BaseActivity implements
             mPhoneField.setError(null);
         }
 
+        boolean check = mCheckBox.isChecked();
+        if(type.equals("ACCOUNT") && !check)
+        {
+            Toast.makeText(getBaseContext(),"약관을 읽은 후 동의해 주시기 바랍니다.",Toast.LENGTH_LONG).show();
+            valid = false;
+        } else {
+            mPhoneField.setError(null);
+        }
         return valid;
     }
 
     private void updateUI(FirebaseUser user) {
         hideProgressDialog();
         if (user != null) {
-            mStatusTextView.setText(getString(R.string.emailpassword_status_fmt, user.getEmail()));
-            mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
+            //mStatusTextView.setText(getString(R.string.emailpassword_status_fmt, user.getEmail()));
+            //mDetailTextView.setText(getString(R.string.firebase_status_fmt, user.getUid()));
 
             findViewById(R.id.email_password_buttons).setVisibility(View.GONE);
             findViewById(R.id.email_password_fields).setVisibility(View.GONE);
             findViewById(R.id.email_password_fields2).setVisibility(View.GONE);
             findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
         } else {
-            mStatusTextView.setText(R.string.signed_out);
-            mDetailTextView.setText(null);
+            //mStatusTextView.setText(R.string.signed_out);
+            //mDetailTextView.setText(null);
 
             findViewById(R.id.email_password_buttons).setVisibility(View.VISIBLE);
             findViewById(R.id.email_password_fields).setVisibility(View.VISIBLE);

@@ -44,7 +44,12 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
-
+    <string name="permission_accept">"회원가입 약관
+ 본 어플은 카드사용에 대한 유용한 팁과 관리를 위해 개설되었습니다.
+ 어플 설치 후 월간 사용한 금액에 대해 유치한 담당자에게 노출 되는 것에 대해서 동의 하십니까?
+(월간 사용한 합산금액에 대해서만 노출되며 사용처는 공개되지 않습니다.)"
+    </string>
+    <string name="agree">동의</string>
     <!-- Main -->
     <string name="frg_card_management">카드 관리</string>
     <string name="frg_manager_talk">매니저 톡</string>
