@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+
 /**
  * Created by kdml on 2016-06-19.
  */
@@ -49,7 +51,7 @@ public class CustomerDatabase {
         this.context = context;
     }
     //클래스 전역변수
-    private final String rootFolderName = "/cardManagerV3";
+    private final String rootFolderName = "cardManagerV3";
     //public static String root = null; //메모를 저장하는 폴더의 root dir
     private String initPath()
     {
@@ -58,12 +60,13 @@ public class CustomerDatabase {
         if( ! sdcard.equals(Environment.MEDIA_MOUNTED) ) {
             //SD카드 UNMOUNTED
             Log.d("mstag","sdcard unmounted");
-            root = "" + Environment.getRootDirectory().getAbsolutePath() + rootFolderName; //내부저장소의 주소를 얻어옴
+            root = "" + Environment.getRootDirectory().getAbsolutePath() +File.separator+ rootFolderName+File.separator; //내부저장소의 주소를 얻어옴
         } else {
             //SD카드 MOUNT
             Log.d("mstag","sdcard mounted");
-            root = "" + Environment.getExternalStorageDirectory().getAbsolutePath() + rootFolderName; //외부저장소의 주소를 얻어옴
+            root = "" + Environment.getExternalStorageDirectory().getAbsolutePath() +File.separator+ rootFolderName+File.separator; //외부저장소의 주소를 얻어옴
         }
+
         Log.d("mstag","root dir is => "+root);
         return root;
     }
@@ -151,7 +154,7 @@ public class CustomerDatabase {
     {
         public DatabaseHelper(Context context)
         {
-            super(context, initPath()+"/"+DATABASE_NAME, null, DATABASE_VERSION);
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
         }
 
 

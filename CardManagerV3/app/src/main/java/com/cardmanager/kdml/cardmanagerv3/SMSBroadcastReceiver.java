@@ -16,7 +16,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,11 +51,11 @@ public class SMSBroadcastReceiver extends BroadcastReceiver {
             Calendar cal = Calendar.getInstance();
             String yyyy = String.valueOf(cal.get(Calendar.YEAR));
             String MM = String.valueOf((cal.get(Calendar.MONTH) + 1));
-
-            String sql = "select cardName , sum(cost) from "+cd.TABLE_SMS_DATA+" where month = "+MM+" and  year = "+yyyy+" group by cardName";
+            //String sql = "select cardName , sum(cost) from "+cd.TABLE_SMS_DATA+" where month = "+MM+" and  year = "+yyyy+" group by cardName";
+            String sql = "select cardName , sum(cost) from "+cd.TABLE_SMS_DATA+" group by cardName";
             sql = "select cardName , sum(cost),year,month,customer.CUSTOMER_EMAIL,customer.CUSTOMER_NAME,customer.CUSTOMER_PHONE,customer.FireBase_ID from "+cd.TABLE_SMS_DATA+" sms\n" +
                     "left join "+cd.TABLE_CUSTOMER_INFO+" customer\n" +
-                    "where month = "+MM+" and year = "+yyyy+" group by cardName";
+                    " group by cardName";
             cs = cd.rawQuery(sql);
             if(cs == null)
                 return;
